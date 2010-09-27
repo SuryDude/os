@@ -1,4 +1,31 @@
 Vic Fryzel <vicfryzel@gmail.com>
 
-Compile & Run:
+= Dependencies =
 
+  Sun JDK 6
+  Apache Ant 1.8
+
+
+= Compile & Run =
+
+  To run this program, you must pass in an input file.  Sample input files 
+  are included in the data/ directory.
+
+  ant run -Dinput=data/input-1
+
+  Alternatively, to run the jar directly, you can use:
+  
+  ant jar
+  java -jar build/jar/os1.jar data/input-1
+
+
+= Run Tests =
+
+  Tests are setup to run the Linker against all of the sample input files in
+  data/ and compare the output with the sample output files in data/.
+
+  The tests currently don't work, because of the output format of logs from
+  the Linker (they show dates and times.)  This makes output comparison
+  in test cases not possible.
+
+  ant test

@@ -1,0 +1,25 @@
+Symbol Table
+X31=5
+
+Memory Map
+0:  2009
+1:  2005 Error: R type address on use chain; treated as E type.
+2:  2005
+3:  2005 Error: A type address on use chain; treated as E type.
+4:  2005 Error: I type address on use chain; treated as E type.
+5:  3005
+
+
+The output above assumes that use list processing precedes relocation
+(or that if relocation is done first, use list processing uses the
+*non-relocated* address to find the next element in the chain).
+
+It is also reasonable to first relocate R 2001 (the first word of the
+middle module) to E 2002 *before* processing the use list.  This makes
+the use chain an infinite list since we are pointing back to where we
+started).  Hence different error msgs would result and are acceptable.
+If you program works in such a manner, please explain it in your
+README file.
+
+This abmiguity illustrates the difficulties of writing unambiguous
+specifications, especially when there are error cases involved.
