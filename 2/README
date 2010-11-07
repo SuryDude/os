@@ -30,7 +30,7 @@ Vic Fryzel <vicfryzel@gmail.com>
 
   There are currently no tests, but if there were:
 
-  Tests are setup to run the Linker against all of the sample input files in
+  Tests are setup to run the Scheduler against all of the sample input files in
   data/ and compare the output with the sample output files in data/.
 
   The tests currently don't work, because of the output format of logs from
