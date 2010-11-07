@@ -10,8 +10,8 @@ import java.util.List;
 
 public class UniScheduler extends FCFSScheduler {
   public UniScheduler(Reader inputReader, Reader randomNumberReader,
-      boolean verbose) {
-    super(inputReader, randomNumberReader, verbose);
+                      boolean verbose, boolean showRandom) {
+    super(inputReader, randomNumberReader, verbose, showRandom);
   }
 
   public void handleBlocked() {
@@ -35,6 +35,7 @@ public class UniScheduler extends FCFSScheduler {
       if (getRunning().size() == 0 && getBlocked().size() == 0) {
         p.run();
         p.setCpuBurstRemaining(getBurst(p.getBurst(), p.getCpu()));
+        appendShowRandomCpuString();
       } else {
         p.processWait();
       }

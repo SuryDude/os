@@ -10,8 +10,8 @@ import java.util.List;
 
 public class FCFSScheduler extends Scheduler {
   public FCFSScheduler(Reader inputReader, Reader randomNumberReader,
-      boolean verbose) {
-    super(inputReader, randomNumberReader, verbose);
+                       boolean verbose, boolean showRandom) {
+    super(inputReader, randomNumberReader, verbose, showRandom);
   }
 
   public void handleBlocked() {
@@ -32,6 +32,7 @@ public class FCFSScheduler extends Scheduler {
       if (getRunning().size() == 0) {
         p.run();
         p.setCpuBurstRemaining(getBurst(p.getBurst(), p.getCpu()));
+        appendShowRandomCpuString();
       } else {
         p.processWait();
       }
@@ -54,9 +55,10 @@ public class FCFSScheduler extends Scheduler {
         p.addTotalCpuTime(1);
         p.setCpuBurstRemaining(p.getCpuBurstRemaining() - 1);
       }
-      if (p.getCpuBurstRemaining() == 0) {
+      if (p.getCpuBurstRemaining() == 0 && p.getCpu() != p.getTotalCpuTime()) {
         p.block();
         p.setIoBurstRemaining(randomOS(p.getIo()));
+        appendShowRandomIoString();
       }
       if (p.getCpu() == p.getTotalCpuTime()) {
         p.terminate(cycle);

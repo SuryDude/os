@@ -6,6 +6,7 @@
   <property name="src.dir" value="src"/>
   <property name="lib.dir" value="lib"/>
   <property name="verbose" value=""/>
+  <property name="show-random" value=""/>
   <path id="classpath">
     <fileset dir="${lib.dir}" includes="**/*.jar"/>
   </path>
@@ -37,7 +38,7 @@
         <path refid="classpath"/>
         <path refid="application"/>
       </classpath>
-      <arg line="${type} ${verbose} ${input}"/>
+      <arg line="--type ${type} ${verbose} ${show-random} ${input}"/>
     </java>
   </target>
 

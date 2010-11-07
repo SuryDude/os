@@ -12,8 +12,8 @@ public class RRScheduler extends FCFSScheduler {
   public static final int QUANTUM = 2;
 
   public RRScheduler(Reader inputReader, Reader randomNumberReader,
-      boolean verbose) {
-    super(inputReader, randomNumberReader, verbose);
+                     boolean verbose, boolean showRandom) {
+    super(inputReader, randomNumberReader, verbose, showRandom);
   }
 
   public void handleReady() {
@@ -21,8 +21,8 @@ public class RRScheduler extends FCFSScheduler {
       if (getRunning().size() == 0) {
         p.setTimer(QUANTUM);
         if (p.getCpuBurstRemaining() == 0) {
-          int burst = getBurst(p.getBurst(), p.getCpu());
-          p.setCpuBurstRemaining(burst);
+          p.setCpuBurstRemaining(getBurst(p.getBurst(), p.getCpu()));
+          appendShowRandomCpuString();
         }
         p.run();
       } else {

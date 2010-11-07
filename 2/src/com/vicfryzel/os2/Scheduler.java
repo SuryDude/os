@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,16 +26,43 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+
 
 public abstract class Scheduler {
+  public static class SchedulerParameters {
+    @Parameter(description = "Path to input file of processes to schedule.",
+               required = true)
+    public List<String> inputFile;
+
+    @Parameter(names = { "-t", "--type" },
+               description = "Type of scheduler to use. {fcfs,hprn,rr2,uni}. Default: fcfs.")
+    public String type = "fcfs";
+
+    @Parameter(names = { "-v", "--verbose" },
+               description = "Show verbose output of each cycle.")
+    public boolean verbose = false;
+
+    @Parameter(names = { "-r", "--show-random" },
+               description = "Show random numbers as they're read.  Only works with --verbose.")
+    public boolean showRandom = false;
+
+    @Parameter(names = { "--random-file" },
+               description = "Path to input file of random numbers (UDRIs).")
+    public String randomFile = "data/random-numbers";
+  }
+
   protected Reader inputReader;
   protected Reader randomNumberReader;
   protected StreamTokenizer randomNumberTokenizer;
   protected List<Process> processes;
   protected Logger logger;
   protected boolean verbose;
+  protected boolean showRandom;
   protected String verboseOutput;
   protected int cycle;
+  protected int latestUDRI;
 
   /**
    * Create a new Scheduler based on the given Reader for random input.
@@ -41,12 +70,14 @@ public abstract class Scheduler {
    * @param inputReader Reader wrapping input stream.
    * @param randomNumberReader Reader wrapping random int stream.
    * @param verbose True if output should be verbose.
+   * @param showRandom True if verbose output should show random numbers used.
    */
-  public Scheduler(Reader inputReader, Reader randomNumberReader, boolean verbose) {
+  public Scheduler(Reader inputReader, Reader randomNumberReader,
+                   boolean verbose, boolean showRandom) {
     this.inputReader = inputReader;
     this.randomNumberReader = randomNumberReader;
     this.verbose = verbose;
-    cycle = 0;
+    this.showRandom = showRandom;
 
     reset();
 
@@ -56,7 +87,6 @@ public abstract class Scheduler {
     } else {
       logger.setLevel(Level.WARNING);
     }
-    verboseOutput = "";
   }
 
   protected void reset() {
@@ -65,7 +95,6 @@ public abstract class Scheduler {
     } catch (IOException e) {}
 
     processes = Process.read(inputReader);
-    Collections.sort(processes, new ProcessArrivalComparator());
 
     try {
       randomNumberReader.reset();
@@ -73,7 +102,55 @@ public abstract class Scheduler {
     randomNumberTokenizer = new StreamTokenizer(randomNumberReader);
     randomNumberTokenizer.eolIsSignificant(false);
     randomNumberTokenizer.parseNumbers();
+
+    cycle = 0;
+    verboseOutput = "";
+    latestUDRI = 0;
   }
+
+  public void scheduleUntilComplete() {
+    printUnsortedProcessList(processes);
+
+    Collections.sort(processes, new ProcessArrivalComparator());
+
+    printSortedProcessList(processes);
+    if (!verbose) {
+      System.out.print("\n\n");
+    } else {
+      System.out.println();
+    }
+
+    // Schedule until all processes are terminated
+    while (step()) {}
+
+    printVerboseOutput();
+    printProcessSummary();
+    printSummary();
+  }
+ 
+  public boolean step() {
+    boolean retval = true;
+
+    if (verbose) {
+      appendVerboseCycleString();
+    }
+
+    handleBlocked();
+    handleRunning();
+    handleArrivals();
+    handleReady();
+    if (getTerminated().size() < processes.size()) {
+      cycle++;
+    } else {
+      retval = false;
+    }
+    return retval;
+  }
+
+  public abstract void handleBlocked();
+  public abstract void handleRunning();
+  public abstract void handleArrivals();
+  public abstract void handleReady();
 
   public List<Process> getProcesses() {
     return processes;
@@ -171,7 +248,7 @@ public abstract class Scheduler {
 
   protected float getCpuUtilization() {
     float retval = 0;
-    for (Process p : getTerminated()) {
+    for (Process p : getProcesses()) {
       retval += (float) p.getTotalCpuTime();
     }
     retval = retval / (float) cycle;
@@ -180,7 +257,7 @@ public abstract class Scheduler {
 
   protected float getIoUtilization() {
     float retval = 0;
-    for (Process p : getTerminated()) {
+    for (Process p : getProcesses()) {
       retval += (float) p.getTotalIoTime();
     }
     retval = retval / (float) cycle;
@@ -191,30 +268,24 @@ public abstract class Scheduler {
     return getTerminated().size() / ((float) cycle / 100);
   }
 
-  protected float getAverageTurnaroundTime() {
-    float retval = 0;
-    List<Process> terminated = getTerminated();
-    for (Process p : terminated) {
+  protected double getAverageTurnaroundTime() {
+    double retval = 0;
+    List<Process> processes = getProcesses();
+    for (Process p : processes) {
       retval += p.getTurnaroundTime();
     }
-    retval = retval / (float) terminated.size();
+    retval = retval / (double) processes.size();
     return retval;
   }
 
-  protected float getAverageWaitTime() {
-    float retval = 0;
-    List<Process> terminated = getTerminated();
-    for (Process p : terminated) {
+  protected double getAverageWaitTime() {
+    double retval = 0;
+    List<Process> processes = getProcesses();
+    for (Process p : processes) {
       retval += p.getTotalWaitTime();
     }
-    retval = retval / (float) terminated.size();
+    retval = retval / (double) processes.size();
     return retval;
-  }
-
-  protected void printVerboseOutput() {
-    if (verbose) {
-      System.out.println(verboseOutput);
-    }
   }
 
   protected void printProcessSummary() {
@@ -229,14 +300,19 @@ public abstract class Scheduler {
   }
 
   protected void printSummary() {
+    DecimalFormat df = new DecimalFormat("#.######");
+    df.setRoundingMode(RoundingMode.HALF_UP);
+    df.setMinimumFractionDigits(6);
     System.out.println("Summary Data:");
     System.out.println("\tFinishing time: " + cycle);
-    System.out.println("\tCPU Utilization: " + getCpuUtilization());
-    System.out.println("\tI/O Utilization: " + getIoUtilization());
-    System.out.println("\tThroughput: " + getThroughput()
+    System.out.println("\tCPU Utilization: " + df.format(getCpuUtilization()));
+    System.out.println("\tI/O Utilization: " + df.format(getIoUtilization()));
+    System.out.println("\tThroughput: " + df.format(getThroughput())
         + " processes per hundred cycles");
-    System.out.println("\tAverage turnaround time: " + getAverageTurnaroundTime());
-    System.out.println("\tAverage waiting time: " + getAverageWaitTime());
+    System.out.println("\tAverage turnaround time: "
+        + df.format(getAverageTurnaroundTime()));
+    System.out.println("\tAverage waiting time: "
+        + df.format(getAverageWaitTime()));
   }
 
   protected void printUnsortedProcessList(List<Process> processes) {
@@ -252,45 +328,8 @@ public abstract class Scheduler {
     for (Process p : processes) {
       output += p.toString() + " ";
     }
-    System.out.println("The (sorted) input is: " + output);
+    System.out.println("The (sorted) input is:  " + output);
   }
-
-  public void scheduleUntilComplete() {
-    printUnsortedProcessList(processes);
-
-    // This line is very important, as we're resetting the process list
-    // in order to sort it
-    processes = getProcesses();
-
-    printSortedProcessList(processes);
-    System.out.print("\n\n");
-
-    // Schedule until all processes are terminated
-    while (getTerminated().size() < processes.size()) {
-      step();
-    }
-
-    printVerboseOutput();
-    printProcessSummary();
-    printSummary();
-  }
- 
-  public void step() {
-    if (verbose) {
-      appendVerboseCycleString();
-    }
-
-    handleBlocked();
-    handleRunning();
-    handleArrivals();
-    handleReady();
-    cycle++;
-  }
-
-  public abstract void handleBlocked();
-  public abstract void handleRunning();
-  public abstract void handleArrivals();
-  public abstract void handleReady();
 
   /**
    * @param u mod param for next random number
@@ -307,6 +346,7 @@ public abstract class Scheduler {
       }
       if (next == randomNumberTokenizer.TT_NUMBER) {
         int value = (int) randomNumberTokenizer.nval;
+        latestUDRI = value;
         random = 1 + (value % u);
       } else {
         logger.severe("Non-numeric token found in random integer file.");
@@ -325,30 +365,52 @@ public abstract class Scheduler {
     return retval;
   }
 
-  public void appendVerboseCycleString() {
-    verboseOutput += "Before cycle  " + cycle + ":";
+  protected void printVerboseOutput() {
+    if (verbose) {
+      System.out.println(
+          "This detailed printout gives the state and remaining burst "
+          + "for each process\n");
+      System.out.println(verboseOutput);
+    }
+  }
+
+  protected static String padLeft(String s, int n) {
+    return String.format("%1$#" + n + "s", s);  
+  }
+
+  protected void appendVerboseCycleString() {
+    verboseOutput += "Before cycle " + padLeft(cycle + ": ", 6);
+    int columnWidth = 14;
     for (Process p : processes) {
       if (!p.isStarted()) {
-        verboseOutput += "   unstarted  0";
+        verboseOutput += padLeft("unstarted  0", columnWidth);
       } else if (p.isReady()) {
-        verboseOutput += "       ready  " + p.getReadyTime();
+        verboseOutput += padLeft("ready  0", columnWidth);
       } else if (p.isBlocked()) {
         int remaining = p.getIoBurstRemaining();
-        verboseOutput += "     blocked  " + remaining;
+        verboseOutput += padLeft("blocked  " + remaining, columnWidth);
       } else if (p.isRunning()) {
         int remaining = p.getCpuBurstRemaining();
-        verboseOutput += "     running  " + remaining;
+        verboseOutput += padLeft("running  " + remaining, columnWidth);
       } else if (p.isTerminated()) {
-        verboseOutput += "  terminated  0";
+        verboseOutput += padLeft("terminated  0", columnWidth);
       }
     }
     verboseOutput += ".\n";
   }
 
-  public static void usageExit() {
-    System.out.println("Usage: java {fcfs,hprn,rr2,uni} [--verbose] path-to-input-file");
-    System.exit(1);
+  protected void appendShowRandomCpuString() {
+    if (verbose && showRandom) {
+      verboseOutput += "Find burst when choosing ready process to run " + latestUDRI + "\n";
+    }
   }
+
+  protected void appendShowRandomIoString() {
+    if (verbose && showRandom) {
+      verboseOutput += "Find I/O burst when blocking a process " + latestUDRI + "\n";
+    }
+  }
+
 
   /**
    * Given an input file, schedule its processes and output the result.
@@ -356,45 +418,44 @@ public abstract class Scheduler {
    * @param args Command-line arguments.
    */
   public static void main(String[] args) {
-    if (args.length < 2) {
-      usageExit();
-    }
-    String type = args[0];
-    String path = args[1];
-    boolean verbose = false;
-    if (args.length == 3 && args[1].equals("--verbose")) {
-      path = args[2];
-      verbose = true;
-    } else if (args.length > 2) {
-      usageExit();
-    }
+    SchedulerParameters s = new SchedulerParameters();
+    JCommander commander = new JCommander(s, args);
+
     Reader inputReader = null, randomNumberReader = null;
+    // JCommander requires main param to be a List, we only want 1st element
+    String inputFile = s.inputFile.get(0);
     try {
       inputReader = new BufferedReader(new InputStreamReader(
-          new FileInputStream(path)));
+          new FileInputStream(inputFile)));
     } catch (FileNotFoundException e) {
-      System.err.println("Could not find file: " + path);
+      System.err.println("Could not find file: " + inputFile);
       System.exit(1);
     }
     try {
       randomNumberReader = new BufferedReader(new InputStreamReader(
-          new FileInputStream("data/random-numbers")));
+          new FileInputStream(s.randomFile)));
     } catch (FileNotFoundException e) {
-      System.err.println("Could not find file: data/random-numbers");
+      System.err.println("Could not find file: " + s.randomFile);
       System.exit(1);
     }
+
     Scheduler scheduler = null;
-    if (type.equals("fcfs")) {
-      scheduler = new FCFSScheduler(inputReader, randomNumberReader, verbose);
-    } else if (type.equals("uni")) {
-      scheduler = new UniScheduler(inputReader, randomNumberReader, verbose);
-    } else if (type.equals("rr2")) {
-      scheduler = new RRScheduler(inputReader, randomNumberReader, verbose);
-    } else if (type.equals("hprn")) {
-      scheduler = new HPRNScheduler(inputReader, randomNumberReader, verbose);
+    if (s.type.equals("fcfs")) {
+      scheduler = new FCFSScheduler(inputReader, randomNumberReader,
+                                    s.verbose, s.showRandom);
+    } else if (s.type.equals("uni")) {
+      scheduler = new UniScheduler(inputReader, randomNumberReader,
+                                   s.verbose, s.showRandom);
+    } else if (s.type.equals("rr2")) {
+      scheduler = new RRScheduler(inputReader, randomNumberReader,
+                                  s.verbose, s.showRandom);
+    } else if (s.type.equals("hprn")) {
+      scheduler = new HPRNScheduler(inputReader, randomNumberReader,
+                                  s.verbose, s.showRandom);
     } else {
-      usageExit();
+      commander.usage();
     }
+
     scheduler.scheduleUntilComplete();
   }
 }

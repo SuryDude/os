@@ -10,8 +10,8 @@ import java.util.List;
 
 public class HPRNScheduler extends FCFSScheduler {
   public HPRNScheduler(Reader inputReader, Reader randomNumberReader,
-      boolean verbose) {
-    super(inputReader, randomNumberReader, verbose);
+                       boolean verbose, boolean showRandom) {
+    super(inputReader, randomNumberReader, verbose, showRandom);
   }
 
   public double getPenalty(Process p) {
