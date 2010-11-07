@@ -1,0 +1,46 @@
+The original input was: 5 ( 0 3 200 3 ) ( 0 9 500 3 ) ( 0 20 500 3 ) ( 100 1 100 3 ) ( 100 100 500 3 ) 
+The (sorted) input is:  5 ( 0 3 200 3 ) ( 0 9 500 3 ) ( 0 20 500 3 ) ( 100 1 100 3 ) ( 100 100 500 3 ) 
+
+
+Process 0:
+	(A,B,C,IO) = (0,3,200,3)
+	Finishing time: 394
+	Turnaround time: 394
+	I/O time: 194
+	Waiting time: 0
+
+Process 1:
+	(A,B,C,IO) = (0,9,500,3)
+	Finishing time: 1097
+	Turnaround time: 1097
+	I/O time: 203
+	Waiting time: 394
+
+Process 2:
+	(A,B,C,IO) = (0,20,500,3)
+	Finishing time: 1685
+	Turnaround time: 1685
+	I/O time: 88
+	Waiting time: 1097
+
+Process 3:
+	(A,B,C,IO) = (100,1,100,3)
+	Finishing time: 1979
+	Turnaround time: 1879
+	I/O time: 194
+	Waiting time: 1585
+
+Process 4:
+	(A,B,C,IO) = (100,100,500,3)
+	Finishing time: 2498
+	Turnaround time: 2398
+	I/O time: 19
+	Waiting time: 1879
+
+Summary Data:
+	Finishing time: 2498
+	CPU Utilization: 0.720576
+	I/O Utilization: 0.279424
+	Throughput: 0.200160 processes per hundred cycles
+	Average turnaround time: 1490.600000
+	Average waiting time: 991.000000

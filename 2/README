@@ -1,0 +1,38 @@
+Vic Fryzel <vicfryzel@gmail.com>
+
+= Dependencies =
+
+  Sun JDK 6
+  Apache Ant 1.8
+
+
+= Compile & Run =
+
+  To run this program, you must pass in an input file.  Sample input files 
+  are included in the data/ directory.
+
+  ant -Dtype=fcfs -Dinput=data/input-1
+
+  To run this program in verbose mode, use the following command.
+  WARNING: Verbose mode drastically slows down execution.
+
+  ant -Dtype=fcfs -Dverbose=--verbose -Dinput=data/input-1
+
+  Valid type values are: fcfs, hprn, rr2, uni
+
+  Alternatively, to run the jar directly, you can use:
+  
+  ant jar
+  java -jar build/jar/os1.jar fcfs --verbose data/input-1
+
+
+= Run Tests =
+
+  Tests are setup to run the Linker against all of the sample input files in
+  data/ and compare the output with the sample output files in data/.
+
+  The tests currently don't work, because of the output format of logs from
+  the Linker (they show dates and times.)  This makes output comparison
+  in test cases not possible.
+
+  ant test

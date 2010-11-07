@@ -1,0 +1,57 @@
+<project name="os2" basedir="." default="main">
+  <property name="build.dir" value="build"/>
+  <property name="classes.dir" value="${build.dir}/classes"/>
+  <property name="data.dir" value="data"/>
+  <property name="jar.dir" value="${build.dir}/jar"/>
+  <property name="src.dir" value="src"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="verbose" value=""/>
+  <path id="classpath">
+    <fileset dir="${lib.dir}" includes="**/*.jar"/>
+  </path>
+  <path id="application" location="${jar.dir}/${ant.project.name}.jar"/>
+
+  <property name="main-class" value="com.vicfryzel.os2.Scheduler"/>
+
+  <target name="clean">
+    <delete dir="build"/>
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+  </target>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="${jar.dir}"/>
+    <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="${main-class}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run" depends="jar">
+    <java fork="true" classname="${main-class}">
+      <classpath>
+        <path refid="classpath"/>
+        <path refid="application"/>
+      </classpath>
+      <arg line="${type} ${verbose} ${input}"/>
+    </java>
+  </target>
+
+  <target name="test" depends="jar">
+    <junit printsummary="yes" fork="yes">
+      <classpath>
+        <path refid="classpath"/>
+        <path refid="application"/>
+      </classpath>
+      <jvmarg value="-Ddata.dir=${data.dir}"/>
+      <test name="com.vicfryzel.os2.test.ProcessTest"/>
+      <formatter type="brief" usefile="false"/>
+    </junit>
+  </target>
+
+  <target name="main" depends="clean,run"/>
+</project>

@@ -1,0 +1,197 @@
+The original input was: 3 ( 1 5 30 3 ) ( 1 5 30 4 ) ( 0 5 30 3 ) 
+The (sorted) input is:  3 ( 0 5 30 3 ) ( 1 5 30 3 ) ( 1 5 30 4 ) 
+
+This detailed printout gives the state and remaining burst for each process
+
+Before cycle    0:   unstarted  0  unstarted  0  unstarted  0.
+Find burst when choosing ready process to run 1804289383
+Before cycle    1:     running  2  unstarted  0  unstarted  0.
+Before cycle    2:     running  1      ready  0      ready  0.
+Find burst when choosing ready process to run 846930886
+Before cycle    3:       ready  0    running  2      ready  0.
+Before cycle    4:       ready  0    running  1      ready  0.
+Find I/O burst when blocking a process 1681692777
+Find burst when choosing ready process to run 1714636915
+Before cycle    5:       ready  0    blocked  1    running  1.
+Find I/O burst when blocking a process 1957747793
+Before cycle    6:     running  2      ready  0    blocked  2.
+Before cycle    7:     running  1      ready  0    blocked  1.
+Find I/O burst when blocking a process 424238335
+Find burst when choosing ready process to run 719885386
+Before cycle    8:     blocked  2    running  2      ready  0.
+Before cycle    9:     blocked  1    running  1      ready  0.
+Find I/O burst when blocking a process 1649760492
+Find burst when choosing ready process to run 596516649
+Before cycle   10:       ready  0    blocked  1    running  2.
+Before cycle   11:       ready  0      ready  0    running  1.
+Find burst when choosing ready process to run 1189641421
+Before cycle   12:     running  2      ready  0      ready  0.
+Before cycle   13:     running  1      ready  0      ready  0.
+Find I/O burst when blocking a process 1025202362
+Find burst when choosing ready process to run 1350490027
+Before cycle   14:     blocked  3    running  2      ready  0.
+Before cycle   15:     blocked  2    running  1      ready  0.
+Before cycle   16:     blocked  1      ready  0    running  2.
+Before cycle   17:       ready  0      ready  0    running  1.
+Before cycle   18:       ready  0    running  1      ready  0.
+Find I/O burst when blocking a process 783368690
+Find burst when choosing ready process to run 1102520059
+Before cycle   19:     running  2    blocked  3      ready  0.
+Before cycle   20:     running  1    blocked  2      ready  0.
+Before cycle   21:       ready  0    blocked  1    running  1.
+Find I/O burst when blocking a process 2044897763
+Before cycle   22:     running  2      ready  0    blocked  4.
+Before cycle   23:     running  1      ready  0    blocked  3.
+Find burst when choosing ready process to run 1967513926
+Before cycle   24:       ready  0    running  2    blocked  2.
+Before cycle   25:       ready  0    running  1    blocked  1.
+Find I/O burst when blocking a process 1365180540
+Before cycle   26:     running  1    blocked  1      ready  0.
+Find I/O burst when blocking a process 1540383426
+Find burst when choosing ready process to run 304089172
+Before cycle   27:     blocked  1      ready  0    running  2.
+Before cycle   28:       ready  0      ready  0    running  1.
+Find burst when choosing ready process to run 1303455736
+Before cycle   29:       ready  0    running  2      ready  0.
+Before cycle   30:       ready  0    running  1      ready  0.
+Find I/O burst when blocking a process 35005211
+Find burst when choosing ready process to run 521595368
+Before cycle   31:     running  2    blocked  3      ready  0.
+Before cycle   32:     running  1    blocked  2      ready  0.
+Before cycle   33:       ready  0    blocked  1    running  1.
+Find I/O burst when blocking a process 294702567
+Before cycle   34:     running  2      ready  0    blocked  4.
+Before cycle   35:     running  1      ready  0    blocked  3.
+Find I/O burst when blocking a process 1726956429
+Find burst when choosing ready process to run 336465782
+Before cycle   36:     blocked  1    running  2    blocked  2.
+Before cycle   37:       ready  0    running  1    blocked  1.
+Find burst when choosing ready process to run 861021530
+Before cycle   38:     running  1      ready  0      ready  0.
+Find I/O burst when blocking a process 278722862
+Before cycle   39:     blocked  3    running  1      ready  0.
+Find I/O burst when blocking a process 233665123
+Find burst when choosing ready process to run 2145174067
+Before cycle   40:     blocked  2    blocked  2    running  2.
+Before cycle   41:     blocked  1    blocked  1    running  1.
+Find burst when choosing ready process to run 468703135
+Before cycle   42:     running  1      ready  0      ready  0.
+Find I/O burst when blocking a process 1101513929
+Find burst when choosing ready process to run 1801979802
+Before cycle   43:     blocked  3    running  2      ready  0.
+Before cycle   44:     blocked  2    running  1      ready  0.
+Before cycle   45:     blocked  1      ready  0    running  1.
+Find I/O burst when blocking a process 1315634022
+Before cycle   46:       ready  0    running  1    blocked  3.
+Find I/O burst when blocking a process 635723058
+Find burst when choosing ready process to run 1369133069
+Before cycle   47:     running  2    blocked  1    blocked  2.
+Before cycle   48:     running  1      ready  0    blocked  1.
+Find burst when choosing ready process to run 1125898167
+Before cycle   49:       ready  0    running  2      ready  0.
+Before cycle   50:       ready  0    running  1      ready  0.
+Before cycle   51:     running  2      ready  0      ready  0.
+Before cycle   52:     running  1      ready  0      ready  0.
+Find burst when choosing ready process to run 1059961393
+Before cycle   53:       ready  0      ready  0    running  2.
+Before cycle   54:       ready  0      ready  0    running  1.
+Before cycle   55:       ready  0    running  1      ready  0.
+Find I/O burst when blocking a process 2089018456
+Before cycle   56:     running  1    blocked  2      ready  0.
+Find I/O burst when blocking a process 628175011
+Before cycle   57:     blocked  2    blocked  1    running  2.
+Before cycle   58:     blocked  1      ready  0    running  1.
+Find I/O burst when blocking a process 1656478042
+Find burst when choosing ready process to run 1131176229
+Before cycle   59:       ready  0    running  2    blocked  3.
+Before cycle   60:       ready  0    running  1    blocked  2.
+Find burst when choosing ready process to run 1653377373
+Before cycle   61:     running  2      ready  0    blocked  1.
+Before cycle   62:     running  1      ready  0      ready  0.
+Before cycle   63:       ready  0    running  2      ready  0.
+Before cycle   64:       ready  0    running  1      ready  0.
+Find burst when choosing ready process to run 859484421
+Before cycle   65:       ready  0      ready  0    running  2.
+Before cycle   66:       ready  0      ready  0    running  1.
+Find I/O burst when blocking a process 1914544919
+Before cycle   67:     running  2      ready  0    blocked  4.
+Before cycle   68:     running  1      ready  0    blocked  3.
+Find I/O burst when blocking a process 608413784
+Before cycle   69:     blocked  3    running  1    blocked  2.
+Find I/O burst when blocking a process 756898537
+Before cycle   70:     blocked  2    blocked  2    blocked  1.
+Find burst when choosing ready process to run 1734575198
+Before cycle   71:     blocked  1    blocked  1    running  2.
+Before cycle   72:       ready  0      ready  0    running  1.
+Find burst when choosing ready process to run 1973594324
+Before cycle   73:     running  2      ready  0      ready  0.
+Before cycle   74:     running  1      ready  0      ready  0.
+Find burst when choosing ready process to run 149798315
+Before cycle   75:       ready  0    running  1      ready  0.
+Find I/O burst when blocking a process 2038664370
+Before cycle   76:       ready  0    blocked  1    running  2.
+Before cycle   77:       ready  0      ready  0    running  1.
+Find I/O burst when blocking a process 1129566413
+Before cycle   78:     running  2      ready  0    blocked  2.
+Before cycle   79:     running  1      ready  0    blocked  1.
+Find burst when choosing ready process to run 184803526
+Before cycle   80:  terminated  0    running  2      ready  0.
+Before cycle   81:  terminated  0    running  1      ready  0.
+Find I/O burst when blocking a process 412776091
+Find burst when choosing ready process to run 1424268980
+Before cycle   82:  terminated  0    blocked  2    running  1.
+Find I/O burst when blocking a process 1911759956
+Before cycle   83:  terminated  0    blocked  1    blocked  1.
+Find burst when choosing ready process to run 749241873
+Before cycle   84:  terminated  0    running  2      ready  0.
+Before cycle   85:  terminated  0    running  1      ready  0.
+Find burst when choosing ready process to run 137806862
+Before cycle   86:  terminated  0 terminated  0    running  2.
+Before cycle   87:  terminated  0 terminated  0    running  1.
+Before cycle   88:  terminated  0 terminated  0    running  1.
+Find I/O burst when blocking a process 42999170
+Before cycle   89:  terminated  0 terminated  0    blocked  3.
+Before cycle   90:  terminated  0 terminated  0    blocked  2.
+Before cycle   91:  terminated  0 terminated  0    blocked  1.
+Find burst when choosing ready process to run 982906996
+Before cycle   92:  terminated  0 terminated  0    running  2.
+Before cycle   93:  terminated  0 terminated  0    running  1.
+Find I/O burst when blocking a process 135497281
+Before cycle   94:  terminated  0 terminated  0    blocked  2.
+Before cycle   95:  terminated  0 terminated  0    blocked  1.
+Find burst when choosing ready process to run 511702305
+Before cycle   96:  terminated  0 terminated  0    running  1.
+Find I/O burst when blocking a process 2084420925
+Before cycle   97:  terminated  0 terminated  0    blocked  2.
+Before cycle   98:  terminated  0 terminated  0    blocked  1.
+Find burst when choosing ready process to run 1937477084
+Before cycle   99:  terminated  0 terminated  0    running  2.
+
+Process 0:
+	(A,B,C,IO) = (0,5,30,3)
+	Finishing time: 79
+	Turnaround time: 79
+	I/O time: 18
+	Waiting time: 31
+
+Process 1:
+	(A,B,C,IO) = (1,5,30,3)
+	Finishing time: 85
+	Turnaround time: 84
+	I/O time: 19
+	Waiting time: 35
+
+Process 2:
+	(A,B,C,IO) = (1,5,30,4)
+	Finishing time: 99
+	Turnaround time: 98
+	I/O time: 30
+	Waiting time: 38
+
+Summary Data:
+	Finishing time: 99
+	CPU Utilization: 0.909091
+	I/O Utilization: 0.575758
+	Throughput: 3.030303 processes per hundred cycles
+	Average turnaround time: 87.000000
+	Average waiting time: 34.666667
