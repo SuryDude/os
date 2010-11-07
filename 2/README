@@ -16,14 +16,14 @@ Vic Fryzel <vicfryzel@gmail.com>
   To run this program in verbose mode, use the following command.
   WARNING: Verbose mode drastically slows down execution.
 
-  ant -Dtype=fcfs -Dverbose=--verbose -Dinput=data/input-1
+  ant -Dtype=fcfs -Dverbose=--verbose -Dshow-random=--show-random -Dinput=data/input-1
 
   Valid type values are: fcfs, hprn, rr2, uni
 
   Alternatively, to run the jar directly, you can use:
   
   ant jar
-  java -jar build/jar/os1.jar fcfs --verbose data/input-1
+  java -jar build/jar/os2.jar --type fcfs --verbose --show-random data/input-1
 
 
 = Run Tests =
