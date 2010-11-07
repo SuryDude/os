@@ -28,11 +28,12 @@ Vic Fryzel <vicfryzel@gmail.com>
 
 = Run Tests =
 
+  There are currently no tests, but if there were:
+
   Tests are setup to run the Linker against all of the sample input files in
   data/ and compare the output with the sample output files in data/.
 
   The tests currently don't work, because of the output format of logs from
-  the Linker (they show dates and times.)  This makes output comparison
-  in test cases not possible.
+  the Scheduler.   This makes output comparison in test cases not possible.
 
   ant test
