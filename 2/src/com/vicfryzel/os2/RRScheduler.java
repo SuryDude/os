@@ -16,6 +16,10 @@ public class RRScheduler extends FCFSScheduler {
     super(inputReader, randomNumberReader, verbose, showRandom);
   }
 
+  protected boolean isTimerBased() {
+    return true;
+  }
+
   public void handleReady() {
     for (Process p : getReady()) {
       if (getRunning().size() == 0) {

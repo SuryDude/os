@@ -55,7 +55,7 @@ public class FCFSScheduler extends Scheduler {
         p.addTotalCpuTime(1);
         p.setCpuBurstRemaining(p.getCpuBurstRemaining() - 1);
       }
-      if (p.getCpuBurstRemaining() == 0 && p.getCpu() != p.getTotalCpuTime()) {
+      if (p.getCpuBurstRemaining() == 0 && p.getCpu() > p.getTotalCpuTime()) {
         p.block();
         p.setIoBurstRemaining(randomOS(p.getIo()));
         appendShowRandomIoString();

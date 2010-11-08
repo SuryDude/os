@@ -74,6 +74,10 @@ public class Process {
     return id;
   }
 
+  public void setId(int id) {
+    this.id = id;
+  }
+
   protected State getState() {
     return state;
   }

@@ -3,10 +3,12 @@
 package com.vicfryzel.os2;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.math.RoundingMode;
@@ -60,9 +62,16 @@ public abstract class Scheduler {
   protected Logger logger;
   protected boolean verbose;
   protected boolean showRandom;
-  protected String verboseOutput;
   protected int cycle;
   protected int latestUDRI;
+  protected int blockedCycles;
+
+  protected ByteArrayOutputStream topOutData;
+  protected PrintStream topOut;
+  protected ByteArrayOutputStream verboseOutData;
+  protected PrintStream verboseOut;
+  protected ByteArrayOutputStream bottomOutData;
+  protected PrintStream bottomOut;
 
   /**
    * Create a new Scheduler based on the given Reader for random input.
@@ -82,11 +91,7 @@ public abstract class Scheduler {
     reset();
 
     logger = Logger.getLogger("Scheduler");
-    if (verbose) {
-      logger.setLevel(Level.INFO);
-    } else {
-      logger.setLevel(Level.WARNING);
-    }
+    logger.setLevel(Level.WARNING);
   }
 
   protected void reset() {
@@ -103,43 +108,76 @@ public abstract class Scheduler {
     randomNumberTokenizer.eolIsSignificant(false);
     randomNumberTokenizer.parseNumbers();
 
+    topOutData = new ByteArrayOutputStream();
+    topOut = new PrintStream(topOutData);
+    verboseOutData = new ByteArrayOutputStream();
+    verboseOut = new PrintStream(verboseOutData);
+    bottomOutData = new ByteArrayOutputStream();
+    bottomOut = new PrintStream(bottomOutData);
+
     cycle = 0;
-    verboseOutput = "";
+    blockedCycles = 0;
     latestUDRI = 0;
   }
 
-  public void scheduleUntilComplete() {
+  protected void resetProcessIds() {
+    for (int i = 0; i < processes.size(); i++) {
+      Process p = processes.get(i);
+      p.setId(i);
+      processes.set(i, p);
+    }
+  }
+
+  public String scheduleUntilComplete() {
     printUnsortedProcessList(processes);
 
     Collections.sort(processes, new ProcessArrivalComparator());
+    resetProcessIds();
 
     printSortedProcessList(processes);
     if (!verbose) {
-      System.out.print("\n\n");
+      topOut.println("\n");
     } else {
-      System.out.println();
+      topOut.println();
+    }
+
+    if (verbose) {
+      verboseOut.println(
+          "This detailed printout gives the state and remaining burst "
+          + "for each process\n");
     }
 
     // Schedule until all processes are terminated
     while (step()) {}
 
-    printVerboseOutput();
+    if (verbose) {
+      verboseOut.println();
+    }
+
     printProcessSummary();
     printSummary();
+
+    if (verbose) {
+      return topOutData.toString() + verboseOutData.toString() + bottomOutData.toString();
+    } else {
+      return topOutData.toString() + bottomOutData.toString();
+    }
   }
  
   public boolean step() {
     boolean retval = true;
 
-    if (verbose) {
-      appendVerboseCycleString();
-    }
+    appendVerboseCycleString();
 
     handleBlocked();
     handleRunning();
     handleArrivals();
     handleReady();
+
     if (getTerminated().size() < processes.size()) {
+      if (getBlocked().size() > 0) {
+        blockedCycles++;
+      }
       cycle++;
     } else {
       retval = false;
@@ -256,16 +294,11 @@ public abstract class Scheduler {
   }
 
   protected float getIoUtilization() {
-    float retval = 0;
-    for (Process p : getProcesses()) {
-      retval += (float) p.getTotalIoTime();
-    }
-    retval = retval / (float) cycle;
-    return retval;
+    return (float) blockedCycles / (float) cycle;
   }
 
-  protected float getThroughput() {
-    return getTerminated().size() / ((float) cycle / 100);
+  protected double getThroughput() {
+    return getTerminated().size() / ((double) cycle / 100);
   }
 
   protected double getAverageTurnaroundTime() {
@@ -290,12 +323,12 @@ public abstract class Scheduler {
 
   protected void printProcessSummary() {
     for (Process p : getTerminated()) {
-      System.out.println("Process " + p.getId() + ":");
-      System.out.println("\t(A,B,C,IO) = " + p.toAltString());
-      System.out.println("\tFinishing time: " + p.getTerminatedTime());
-      System.out.println("\tTurnaround time: " + p.getTurnaroundTime());
-      System.out.println("\tI/O time: " + p.getTotalIoTime());
-      System.out.println("\tWaiting time: " + p.getTotalWaitTime() + "\n");
+      bottomOut.println("Process " + p.getId() + ":");
+      bottomOut.println("\t(A,B,C,IO) = " + p.toAltString());
+      bottomOut.println("\tFinishing time: " + p.getTerminatedTime());
+      bottomOut.println("\tTurnaround time: " + p.getTurnaroundTime());
+      bottomOut.println("\tI/O time: " + p.getTotalIoTime());
+      bottomOut.println("\tWaiting time: " + p.getTotalWaitTime() + "\n");
     }
   }
 
@@ -303,15 +336,15 @@ public abstract class Scheduler {
     DecimalFormat df = new DecimalFormat("#.######");
     df.setRoundingMode(RoundingMode.HALF_UP);
     df.setMinimumFractionDigits(6);
-    System.out.println("Summary Data:");
-    System.out.println("\tFinishing time: " + cycle);
-    System.out.println("\tCPU Utilization: " + df.format(getCpuUtilization()));
-    System.out.println("\tI/O Utilization: " + df.format(getIoUtilization()));
-    System.out.println("\tThroughput: " + df.format(getThroughput())
+    bottomOut.println("Summary Data:");
+    bottomOut.println("\tFinishing time: " + cycle);
+    bottomOut.println("\tCPU Utilization: " + df.format(getCpuUtilization()));
+    bottomOut.println("\tI/O Utilization: " + df.format(getIoUtilization()));
+    bottomOut.println("\tThroughput: " + df.format(getThroughput())
         + " processes per hundred cycles");
-    System.out.println("\tAverage turnaround time: "
+    bottomOut.println("\tAverage turnaround time: "
         + df.format(getAverageTurnaroundTime()));
-    System.out.println("\tAverage waiting time: "
+    bottomOut.println("\tAverage waiting time: "
         + df.format(getAverageWaitTime()));
   }
 
@@ -320,7 +353,7 @@ public abstract class Scheduler {
     for (Process p : processes) {
       output += p.toString() + " ";
     }
-    System.out.println("The original input was: " + output);
+    topOut.println("The original input was: " + output);
   }
 
   protected void printSortedProcessList(List<Process> processes) {
@@ -328,7 +361,7 @@ public abstract class Scheduler {
     for (Process p : processes) {
       output += p.toString() + " ";
     }
-    System.out.println("The (sorted) input is:  " + output);
+    topOut.println("The (sorted) input is:  " + output);
   }
 
   /**
@@ -365,13 +398,11 @@ public abstract class Scheduler {
     return retval;
   }
 
-  protected void printVerboseOutput() {
-    if (verbose) {
-      System.out.println(
-          "This detailed printout gives the state and remaining burst "
-          + "for each process\n");
-      System.out.println(verboseOutput);
-    }
+  /**
+   * Returns false if this scheduler is timer based (e.g. RR).
+   */
+  protected boolean isTimerBased() {
+    return false;
   }
 
   protected static String padLeft(String s, int n) {
@@ -379,35 +410,36 @@ public abstract class Scheduler {
   }
 
   protected void appendVerboseCycleString() {
-    verboseOutput += "Before cycle " + padLeft(cycle + ": ", 6);
+    verboseOut.print("Before cycle " + padLeft(cycle + ": ", 6));
     int columnWidth = 14;
     for (Process p : processes) {
       if (!p.isStarted()) {
-        verboseOutput += padLeft("unstarted  0", columnWidth);
+        verboseOut.print(padLeft("unstarted  0", columnWidth));
       } else if (p.isReady()) {
-        verboseOutput += padLeft("ready  0", columnWidth);
+        verboseOut.print(padLeft("ready  0", columnWidth));
       } else if (p.isBlocked()) {
         int remaining = p.getIoBurstRemaining();
-        verboseOutput += padLeft("blocked  " + remaining, columnWidth);
+        verboseOut.print(padLeft("blocked  " + remaining, columnWidth));
       } else if (p.isRunning()) {
-        int remaining = p.getCpuBurstRemaining();
-        verboseOutput += padLeft("running  " + remaining, columnWidth);
+        String remaining = String.valueOf(p.getCpuBurstRemaining());
+        verboseOut.print(padLeft("running" + padLeft(remaining, 3), columnWidth));
       } else if (p.isTerminated()) {
-        verboseOutput += padLeft("terminated  0", columnWidth);
+        verboseOut.print(padLeft("terminated  0", columnWidth));
       }
     }
-    verboseOutput += ".\n";
+    verboseOut.print(".");
+    verboseOut.println();
   }
 
   protected void appendShowRandomCpuString() {
     if (verbose && showRandom) {
-      verboseOutput += "Find burst when choosing ready process to run " + latestUDRI + "\n";
+      verboseOut.println("Find burst when choosing ready process to run " + latestUDRI);
     }
   }
 
   protected void appendShowRandomIoString() {
     if (verbose && showRandom) {
-      verboseOutput += "Find I/O burst when blocking a process " + latestUDRI + "\n";
+      verboseOut.println("Find I/O burst when blocking a process " + latestUDRI);
     }
   }
 
@@ -456,6 +488,6 @@ public abstract class Scheduler {
       commander.usage();
     }
 
-    scheduler.scheduleUntilComplete();
+    System.out.print(scheduler.scheduleUntilComplete());
   }
 }

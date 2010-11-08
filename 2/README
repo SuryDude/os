@@ -28,12 +28,18 @@ Vic Fryzel <vicfryzel@gmail.com>
 
 = Run Tests =
 
-  There are currently no tests, but if there were:
+  Tests are setup to run each Scheduler against all of the sample input files
+  in data/ and compare the output with the sample output files in data/.
 
-  Tests are setup to run the Scheduler against all of the sample input files in
-  data/ and compare the output with the sample output files in data/.
-
-  The tests currently don't work, because of the output format of logs from
-  the Scheduler.   This makes output comparison in test cases not possible.
+  To run the tests, use:
 
   ant test
+
+  There are also tests that compare verbose output, and verbose output with
+  random numbers.  These tests have been moved into a separate ant target and
+  JUnit suite because they don't quite match work, as the output differs very
+  slightly.
+
+  To run the verbose tests, use:
+  
+  ant test-verbose
