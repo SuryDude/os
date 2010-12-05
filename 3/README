@@ -1,0 +1,27 @@
+Vic Fryzel <vicfryzel@gmail.com>
+
+= Dependencies =
+
+  Sun JDK 6
+  Apache Ant 1.8
+
+
+= Compile & Run =
+
+  To run this program, you must pass in an input file.  Sample input files 
+  are included in the data/ directory.
+
+  ant -Dinput=data/input-01
+
+  Alternatively, to run the jar directly, you can use:
+  
+  ant jar
+  java -jar build/jar/os3.jar data/input-01
+
+  As a convenience mechanism, there is all.sh, which:
+    * Builds the JAR
+    * Runs the JAR against all 13 input files in data/.
+
+  To run it, use:
+
+  ./all.sh
