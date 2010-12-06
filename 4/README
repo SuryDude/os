@@ -1,0 +1,32 @@
+Vic Fryzel <vicfryzel@gmail.com>
+
+= Dependencies =
+
+  Sun JDK 6
+  Apache Ant 1.8
+
+
+= Compile & Run =
+
+  To run this program, you must pass in the relevant command-line arguments.
+
+  ant -Dmachine-size=10 -Dpage-size=10 -Dprocess-size=20 -Djob-mix=1 \
+      -Dnum-references=10 -Dalgorithm=lru
+
+  To run this program in verbose/debug mode, use the following command.
+
+  ant -Dmachine-size=10 -Dpage-size=10 -Dprocess-size=20 -Djob-mix=1 \
+      -Dnum-references=10 -Dalgorithm=lru -Ddebug=--debug
+
+  Valid algorithms are: lru, lifo, random
+
+  Alternatively, to run the jar directly, you can use:
+  
+  ant jar
+  java -jar build/jar/os4.jar -s 10 -p 10 -o 20 -j 1 -n 10 -a lru \
+      --random-file data/random-numbers --debug
+
+  To run a set of 15 inputs at once (for which corresponding output files 
+  are in data/,) use:
+
+  ./all.sh
