@@ -2,6 +2,9 @@
 
 package com.vicfryzel.os4;
 
+/**
+ * Replace pages into frames by choosing a random frame.
+ */
 public class RandomPager extends Pager {
   protected Driver driver;
 

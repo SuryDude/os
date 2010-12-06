@@ -2,6 +2,9 @@
 
 package com.vicfryzel.os4;
 
+/**
+ * Pager that replaces pages in LIFO manner when choosing frame to replace.
+ */
 public class LIFOPager extends Pager {
   public LIFOPager(int machineSize, int pageSize)  {
     super(machineSize, pageSize);

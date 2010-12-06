@@ -5,6 +5,9 @@ package com.vicfryzel.os4;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manage Pages into Frames as Processes make references.
+ */
 public abstract class Pager {
   protected List<Frame> frames;
   protected int machineSize;

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Represents a single Process in this system making references.
  */
 public class Process {
   protected int id;

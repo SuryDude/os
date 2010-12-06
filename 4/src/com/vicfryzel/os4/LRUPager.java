@@ -2,6 +2,9 @@
 
 package com.vicfryzel.os4;
 
+/**
+ * Replace pages in a Least Recently Used manner when choosing frame to replace.
+ */
 public class LRUPager extends Pager {
   public LRUPager(int machineSize, int pageSize) {
     super(machineSize, pageSize);

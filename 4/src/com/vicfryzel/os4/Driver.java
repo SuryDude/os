@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,6 +19,9 @@ import java.util.logging.Logger;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
+/**
+ * Drives the Pager to page through references as needed and handle faults.
+ */
 public class Driver {
   public static class DriverParameters {
     @Parameter(names = { "-s", "--machine-size" },

@@ -3,7 +3,7 @@
 package com.vicfryzel.os4;
 
 /**
- *
+ * Represents a single frame in this machine.
  */
 public class Frame {
   protected Page currentPage;

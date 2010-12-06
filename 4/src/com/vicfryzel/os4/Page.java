@@ -3,7 +3,8 @@
 package com.vicfryzel.os4;
 
 /**
- *
+ * Represents a single page in the system, with relative addresses for a 
+ * Process.
  */
 public class Page {
   protected int id;
